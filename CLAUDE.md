@@ -10,6 +10,8 @@ binds to 127.0.0.1, nothing is deployed.
 - **Claude** (the main session) is always in.
 - Only these agents appear: **Rose, Priya, Dianne, Bella, Queenie, Ruby, Jeff**
   (`office.roster.json`). Every other agent type is ignored by the server.
+- **Real updates only** in the live office: no random office events (fake "Deploy
+  successful!", pizza, fire drill) and no break chatter — those run in `?sim` only.
 - **No boss character for Justin** — he asked to be left out. What he types in
   the chat box still posts under his name (`office.config.json`, gitignored).
 

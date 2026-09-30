@@ -1468,7 +1468,8 @@ const App: React.FC = () => {
               const isBoss = updated.id === BOSS_ID
               const breakMsg = useWater ? waterMessage() : (isBoss ? 'grabbing a Red Bull' : coffeeMessage())
               const breakIcon = isBoss ? '🥫' : (useWater ? '💧' : '☕')
-              addMsg(updated.name, updated.role, cfg.color, `${breakIcon} ${breakMsg}`)
+              // Breaks still happen (characters walk to coffee/water) but only post in the ?sim demo
+              if (isSimMode) addMsg(updated.name, updated.role, cfg.color, `${breakIcon} ${breakMsg}`)
               if (!sfx.isMuted()) sfx.playCoffee()
 
               const breakTarget = { x: breakSpot.x, y: breakSpot.y }
@@ -1520,6 +1521,9 @@ const App: React.FC = () => {
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
+    // Live office shows real agent updates only (Justin's call): a fake "Deploy successful!"
+    // next to real work is misleading. Events stay for the ?sim demo.
+    if (!isSimMode) return
     // Percentage-based target positions for each event type (matching room layout)
     const EVENT_TARGETS: Record<string, { x: number; y: number }> = {
       'fire-drill': { x: 67.5, y: 48.9 },
