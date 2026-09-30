@@ -1,0 +1,20 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "createdAt": "2026-09-30T05:19:43.551Z",
+        "reason": "Claude decided: upstream W17ant/Claude-Office pixel-art game motion (speech-bubble and emoji-reaction pops) in src/styles/office.css, not changed by Justin's tasks"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "typingbounce",
+        "createdAt": "2026-09-30T05:19:43.851Z",
+        "reason": "Claude decided: upstream W17ant/Claude-Office chat typing-dots bounce in src/styles/office.css, intentional game-style motion, not changed by Justin's tasks"
+      }
+    ]
+  }
+}
