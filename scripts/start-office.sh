@@ -112,7 +112,10 @@ rm -f "$WATCHER_PID_FILE"
 
 # Open in browser
 echo -e "${CYAN}[...]${RESET} Opening Agent Office..."
-open http://localhost:3333
+case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) cmd.exe //c start "" http://localhost:3333 ;;
+    *) open http://localhost:3333 ;;
+esac
 
 echo ""
 echo -e "${GREEN}Agent Office is running!${RESET}"

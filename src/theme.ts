@@ -135,7 +135,9 @@ export function getSpriteDir(): string {
 /** Kept signature-compatible for existing callers — agentId ignored; role is the key. */
 export function getSpritePath(_agentId: string, role: string, defaultBase: string, direction: string): string {
   const base = getCharacterBaseForRole(role, defaultBase)
-  return `${getSpriteDir()}/${base}-${direction}.png`
+  // A base with a folder (e.g. office/characters/pam-beesly) is a path under /sprites
+  const dir = base.includes('/') ? '/sprites' : getSpriteDir()
+  return `${dir}/${base}-${direction}.png`
 }
 
 export function getRoomImage(phase: 'day' | 'night'): string {

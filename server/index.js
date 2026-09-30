@@ -25,6 +25,7 @@ const __dirname = dirname(__filename)
 const NOTIFY_SCRIPT = join(__dirname, '..', 'scripts', 'notify.sh')
 
 function sendNotification(title, msg) {
+  if (process.platform !== 'darwin') return  // notify.sh uses osascript (macOS only)
   try {
     const child = execFile('bash', [NOTIFY_SCRIPT, title, msg], { timeout: 3000 })
     child.unref()
@@ -103,6 +104,23 @@ function discoverMcpServers() {
 /** @type {Map<string, object>} agentId -> agent object */
 const activeAgents = new Map()
 
+// Justin's roster (office.roster.json): subagent_type -> display name.
+// Only roster agents appear in the office; every other agent type is ignored.
+const ROSTER = JSON.parse(readFileSync(join(__dirname, '..', 'office.roster.json'), 'utf8'))
+const onRoster = (role) => Object.hasOwn(ROSTER.roles, role)
+
+// SubagentStart carries no description, so the PreToolUse(Agent) hook sends
+// it first as agent_task; the next spawn of that role picks it up.
+/** @type {Map<string, {task: string, at: number}[]>} role -> queued task descriptions */
+const pendingTasks = new Map()
+
+function takePendingTask(role) {
+  const queue = pendingTasks.get(role) ?? []
+  // Drop stale entries (an Agent call that was denied never starts)
+  while (queue.length && Date.now() - queue[0].at > 60_000) queue.shift()
+  return queue.shift()?.task ?? ''
+}
+
 /**
  * Generate a stable agent ID from the event payload.
  * Uses the provided id, or derives one from name+role.
@@ -118,6 +136,7 @@ function resolveAgentId(agent) {
 // ---------------------------------------------------------------------------
 
 const KNOWN_EVENT_TYPES = new Set([
+  'agent_task',
   'agent_spawned',
   'agent_working',
   'agent_completed',
@@ -414,7 +433,8 @@ app.get('/chat/cron-state', (_req, res) => {
     const data = readFileSync(cronStatePath, 'utf8')
     res.json(JSON.parse(data))
   } catch {
-    res.json({ paused: false, consecutive_idle_count: 0, last_seen_timestamp: 0 })
+    // Chat AI starts OFF: replies run `claude -p`, which uses Justin's plan usage
+    res.json({ paused: true, consecutive_idle_count: 0, last_seen_timestamp: 0 })
   }
 })
 
@@ -437,14 +457,24 @@ app.post('/chat/cron-state', (req, res) => {
 
 function processEvent(body) {
   switch (body.type) {
+    case 'agent_task': {
+      const role = body.agent?.role ?? ''
+      if (!onRoster(role)) return null
+      if (!pendingTasks.has(role)) pendingTasks.set(role, [])
+      pendingTasks.get(role).push({ task: body.agent?.task ?? '', at: Date.now() })
+      return null  // nothing to show until the agent actually starts
+    }
+
     case 'agent_spawned': {
       const agent = body.agent ?? {}
+      const role = agent.role ?? ''
+      if (!onRoster(role)) return null
       const id = resolveAgentId(agent)
       const record = {
         id,
-        name:   agent.name  ?? 'Agent',
-        role:   agent.role  ?? 'general-purpose',
-        task:   agent.task  ?? agent.description ?? '',
+        name:   agent.name  ?? ROSTER.roles[role]?.name ?? 'Agent',
+        role,
+        task:   agent.task  ?? takePendingTask(role),
         state:  'new-hire',
         spawnedAt: Date.now(),
       }
@@ -474,6 +504,9 @@ function processEvent(body) {
 
     case 'agent_completed': {
       const id = body.agentId
+      // Not tracked = off-roster agent (ignored at spawn). SubagentStop can also fire more
+      // than once per agent (e.g. again on hand-back) — handle the first only.
+      if (!activeAgents.has(id) || activeAgents.get(id).state === 'completed') return null
       if (id && activeAgents.has(id)) {
         const agent = activeAgents.get(id)
         agent.state = 'completed'

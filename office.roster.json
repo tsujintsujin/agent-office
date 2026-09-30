@@ -1,0 +1,12 @@
+{
+  "_comment": "Justin's agents. Key = Claude Code subagent_type. ONLY these appear in the office; every other agent type is ignored. You (boss) and Claude (main session) are always present. sprite = base name in public/sprites/characters, or a path under public/sprites (e.g. office/characters/karen-filippelli).",
+  "roles": {
+    "rose":    { "name": "Rose",    "title": "Researcher",        "sprite": "Frontend-dev-1",                     "color": "#e74c3c", "emoji": "🔎" },
+    "priya":   { "name": "Priya",   "title": "Planner",           "sprite": "office/characters/kelly-kapoor",     "color": "#9b59b6", "emoji": "🗺️" },
+    "dianne":  { "name": "Dianne",  "title": "Designer",          "sprite": "dev-2",                              "color": "#1abc9c", "emoji": "🎨" },
+    "bella":   { "name": "Bella",   "title": "Builder",           "sprite": "employee-2",                         "color": "#3498db", "emoji": "🛠️" },
+    "queenie": { "name": "Queenie", "title": "QA",                "sprite": "security-audit-1",                   "color": "#f39c12", "emoji": "🧪" },
+    "ruby":    { "name": "Ruby",    "title": "Reviewer",          "sprite": "office/characters/karen-filippelli", "color": "#c0392b", "emoji": "📋" },
+    "jeff":    { "name": "Jeff",    "title": "Assistant Manager", "sprite": "employee-1",                         "color": "#607d8b", "emoji": "🗂️" }
+  }
+}
