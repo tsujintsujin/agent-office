@@ -1,0 +1,2 @@
+# Bash scripts break on CRLF ($'\r' errors). Keep them LF even with core.autocrlf=true on Windows.
+*.sh text eol=lf

@@ -17,7 +17,7 @@ for dir in /Users/Antony/agent-office /Users/Antony; do
 done
 
 # Active agents
-AGENTS=$(curl -sf "$SERVER/roster" 2>/dev/null | python3 -c "
+AGENTS=$(curl -sf "$SERVER/roster" 2>/dev/null | "$PY" -c "
 import sys,json
 d=json.load(sys.stdin)
 agents=d.get('activeAgents',[])

@@ -47,7 +47,7 @@ export interface OfficeEvent {
   text?: string
 }
 
-import { BOSS_NAME, BOSS_COLOR, BOSS_EMOJI } from './config'
+import { BOSS_NAME, BOSS_COLOR, BOSS_EMOJI, ROSTER } from './config'
 
 export const AGENT_CONFIGS: Record<string, { color: string; emoji: string; title: string }> = {
   // The boss — configured via office.config.json
@@ -79,4 +79,6 @@ export const AGENT_CONFIGS: Record<string, { color: string; emoji: string; title
   'ios-simulator':         { color: '#a2aaad', emoji: '📱', title: 'iOS' },
   'assistant':             { color: '#cc785c', emoji: '🤖', title: 'Claude' },
   'default':               { color: '#95a5a6', emoji: '👤', title: 'Worker' },
+  // Justin's agents (office.roster.json)
+  ...Object.fromEntries(Object.entries(ROSTER.roles).map(([role, r]) => [role, { color: r.color, emoji: r.emoji, title: r.name }])),
 }

@@ -283,9 +283,9 @@ const OFFICE_SIM_CHATTER = [
 const App: React.FC = () => {
   // All hooks must be at the top — before any conditional returns.
   const theme = useTheme() // Why: re-render rooms + agents when /the-office toggles
-  const [agents, setAgents] = useState<Agent[]>(() => [createBoss(), createClaude()])
+  // Justin's office: Claude is always in; the boss character is left out on purpose (Justin asked)
+  const [agents, setAgents] = useState<Agent[]>(() => [createClaude()])
   const agentMetaRef = useRef<Map<string, AgentMeta>>(new Map([
-    [BOSS_ID, { spawnedAt: Date.now(), arrivedAtDeskAt: Date.now(), idleSince: null, onBreak: false, breakStartedAt: null }],
     [CLAUDE_ID, { spawnedAt: Date.now(), arrivedAtDeskAt: Date.now(), idleSince: null, onBreak: false, breakStartedAt: null }],
   ]))
 
@@ -500,8 +500,6 @@ const App: React.FC = () => {
   useEffect(() => {
     if (arrivedRef.current) return
     arrivedRef.current = true
-    const bossCfg = AGENT_CONFIGS[BOSS_ROLE] ?? AGENT_CONFIGS['default']
-    addMsg(bossCfg.title, BOSS_ROLE, bossCfg.color, '👑 clocked in')
     const claudeCfg = AGENT_CONFIGS[CLAUDE_ROLE] ?? AGENT_CONFIGS['default']
     setTimeout(() => {
       addMsg(claudeCfg.title, CLAUDE_ROLE, claudeCfg.color, '🤖 clocked in')
@@ -678,29 +676,6 @@ const App: React.FC = () => {
             effects.push({
               msg: { sender: a.name, role: a.role, color: cfg.color, text: `✅ ${resultMsg}` },
               sfx: 'celebration',
-            })
-
-            // Boss replies to completed tasks
-            const bossCfg = AGENT_CONFIGS[BOSS_ROLE] ?? AGENT_CONFIGS['default']
-            const bossReplies = [
-              `nice work ${a.name} 👊`,
-              `solid 🔥`,
-              `ship it!`,
-              `great stuff, grab a Red Bull`,
-              `legend 💯`,
-              `good job, who\'s next?`,
-              `that was quick, another one?`,
-              `clean work 👌`,
-              `cheers ${a.name}`,
-              `merged. next task loading...`,
-            ]
-            // Why: when Office theme is on, Michael Scott occasionally lands his signature line.
-            const isMichael = getTheme() === 'office'
-            const reply = isMichael && Math.random() < 0.25
-              ? `That's what she said 😏`
-              : bossReplies[Math.floor(Math.random() * bossReplies.length)]
-            effects.push({
-              msg: { sender: bossCfg.title, role: BOSS_ROLE, color: bossCfg.color, text: reply },
             })
 
             // Mark as completed and start walking to door
@@ -1573,13 +1548,6 @@ const App: React.FC = () => {
           case 'notification': sfx.playNotification(); break
           case 'coffee':       sfx.playCoffee(); break
         }
-      }
-
-      // Manager message from boss
-      if (event.managerMessage) {
-        setTimeout(() => {
-          addMsg(bossCfg.title, BOSS_ROLE, bossCfg.color, event.managerMessage!)
-        }, 500)
       }
 
       // Staggered agent messages as reactions

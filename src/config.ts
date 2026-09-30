@@ -5,6 +5,11 @@
  * Users can customise their boss name, sprite, and colour there.
  */
 
+import roster from '../office.roster.json'
+
+export interface RosterEntry { name: string; title: string; sprite: string; color: string; emoji: string }
+export const ROSTER = roster as unknown as { roles: Record<string, RosterEntry> }
+
 // Load user config (office.config.json) — bundled by Vite
 let userConfig: { boss?: { name?: string; sprite?: string; color?: string; emoji?: string } } = {}
 try {
@@ -54,4 +59,6 @@ export const ROLE_TO_CHAR: Record<string, string> = {
   'seo':                   'Frontend-dev-1',
   'gmail':                 'dev-1',
   'ios-simulator':         'security-audit-1',
+  // Justin's agents (office.roster.json) — override the defaults above
+  ...Object.fromEntries(Object.entries(ROSTER.roles).map(([role, r]) => [role, r.sprite])),
 }

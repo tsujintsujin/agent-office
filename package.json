@@ -72,5 +72,9 @@
         "to": "public"
       }
     ]
+  },
+  "allowScripts": {
+    "better-sqlite3@12.8.0": true,
+    "esbuild@0.21.5": true
   }
 }
